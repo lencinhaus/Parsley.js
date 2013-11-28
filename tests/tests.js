@@ -1,8 +1,8 @@
 'use strict';
 
 window.ParsleyConfig = $.extend( true, {}, window.ParsleyConfig, {
-    // deactivate errors animation, causing travis test suite failing
-    animate: false
+  // deactivate errors animation, causing travis test suite failing
+  animate: false
   , priorityEnabled: false
   , scrollDuration: 0
   , messages: {
@@ -66,7 +66,7 @@ $( '#validator-tests' ).parsley( {
     }
   }
   , messages: {
-      multiple: 'This field should be a multiple of %s'
+    multiple: 'This field should be a multiple of %s'
   }
 } );
 
@@ -133,8 +133,8 @@ var testSuite = function () {
   describe ( suiteVersion, function () {
 
     /***************************************
-            Fields validators binding
-    ***************************************/
+     Fields validators binding
+     ***************************************/
     describe ( 'Test Parsley auto binding', function () {
       it ( 'Items with validation methods inside a form validated by Parsley are binded', function () {
         // with parsley-validate
@@ -151,7 +151,9 @@ var testSuite = function () {
       } )
       it ( 'Do not bind an input that type is hidden', function () {
         expect( $( '#hidden' ).hasClass( 'parsley-validated' ) ).to.be( false );
-        expect( $( '#hidden' ).parsley( 'validate' ) ).to.be( null );
+        $( '#hidden' ).parsley( 'validate').done( function( valid ) {
+          expect( valid ).to.be( null );
+        });
       } )
       it ( 'Should bind a DOM element with parsley-bind value set to true', function () {
         expect( $( '#bindNonFormInput' ).hasClass( 'parsley-validated' ) ).to.be( true );
@@ -159,23 +161,23 @@ var testSuite = function () {
     } )
 
     /***************************************
-                trigger events
-    ***************************************/
+     trigger events
+     ***************************************/
     describe ( 'Test inputs events', function () {
       var events = [ 'change', 'keyup' ];
-        it ( 'Validators are triggered on jQuery events: ' + events.join( ', ' ) , function () {
-          for ( var event in events ) {
-            var value = ( ( parseInt( event ) + 1 ) % 2 ) * 100000 + 100;
-            $( '#input1' ).val( value );
-            $( '#input1' ).trigger( $.Event( events[event] ) );
-            expect( $( '#input1' ).hasClass( 'parsley-error' ) ).to.be( value == 100 );
-          }
-        } )
+      it ( 'Validators are triggered on jQuery events: ' + events.join( ', ' ) , function () {
+        for ( var event in events ) {
+          var value = ( ( parseInt( event ) + 1 ) % 2 ) * 100000 + 100;
+          $( '#input1' ).val( value );
+          $( '#input1' ).trigger( $.Event( events[event] ) );
+          expect( $( '#input1' ).hasClass( 'parsley-error' ) ).to.be( value == 100 );
+        }
+      } )
     } )
 
     /***************************************
-          Error & success detection
-    ***************************************/
+     Error & success detection
+     ***************************************/
     describe ( 'Test Parsley error & success detection', function () {
       it ( 'If chars < minChars, on field change, do not trigger validation', function () {
         $( '#input2' ).val( 'foo' );
@@ -196,8 +198,8 @@ var testSuite = function () {
     } )
 
     /***************************************
-          Error messages management
-    ***************************************/
+     Error messages management
+     ***************************************/
     describe ( 'Test Parsley error messages management', function () {
       var fieldHash =  $( '#errormanagement' ).parsley( 'getHash' );
 
@@ -230,19 +232,23 @@ var testSuite = function () {
       })
       it ( 'Test prioritized validators', function () {
         $( '#priorityValidator' ).val('notanemail');
-        expect( $( '#priorityForm' ).parsley( 'validate' ) ).to.be( false );
+        $( '#priorityForm' ).parsley( 'validate').done( function( valid ) {
+          expect( valid ).to.be( false );
+        } );
         // just type validation error
         expect( $( '#' + $( '#priorityValidator' ).parsley( 'getHash' ) + ' li.type' ).length ).to.be( 1 );
         $( '#priorityValidator' ).val('foo@bar.baz');
-        expect( $( '#priorityForm' ).parsley( 'validate' ) ).to.be( false );
+        $( '#priorityForm' ).parsley( 'validate').done( function( valid ) {
+          expect( valid ).to.be( false );
+        } );
         // 15 chars min length validator here
         expect( $( '#' + $( '#priorityValidator' ).parsley( 'getHash' ) + ' li.minlength' ).length ).to.be( 1 );
       } )
     } )
 
     /***************************************
-                test validators
-    ***************************************/
+     test validators
+     ***************************************/
     describe ( 'Test validators', function () {
       it ( 'notblank', function () {
         triggerSubmitValidation( '#notblank', '   ' );
@@ -288,7 +294,9 @@ var testSuite = function () {
         expect( $( '#required-html5-bis' ).hasClass( 'parsley-success' ) ).to.be( true );
       } )
       it ( 'required - select multiple', function () {
-        expect( $( '#required-selectmultiple' ).parsley( 'validate' ) ).to.be( false );
+        $( '#required-selectmultiple' ).parsley( 'validate').done( function( valid ) {
+          expect( valid ).to.be( false );
+        } );
       } )
       it ( 'minlength', function () {
         triggerSubmitValidation( '#minlength', '12345' );
@@ -370,7 +378,7 @@ var testSuite = function () {
       } )
 
       var urls = [
-          { url: "http://foo.com/bar_(baz)#bam-1", expected: true, strict: true }
+        { url: "http://foo.com/bar_(baz)#bam-1", expected: true, strict: true }
         , { url: "http://www.foobar.com/baz/?p=364", expected: true, strict: true }
         , { url: "mailto:name@example.com", expected: true, strict: false }
         , { url: "foo.bar", expected: true, strict: false }
@@ -388,19 +396,25 @@ var testSuite = function () {
       it ( 'url', function () {
         for ( var i in urls ) {
           $( '#typeurl' ).val( urls[i].url );
-          expect( $( '#typeurl' ).parsley( 'validate' ) ).to.be( urls[ i ].expected );
+          $( '#typeurl' ).parsley( 'validate').done( function( valid ) {
+            expect( valid ).to.be( urls[ i ].expected );
+          } );
         }
         triggerSubmitValidation( '#typeurl', 'foo' );
         expect( getErrorMessage( '#typeurl', 'type') ).to.be( 'This value should be a valid url.' );
       } )
       it ( 'url html5', function () {
         $( '#typeurl-html5' ).val( "http://foo.bar" );
-        expect( $( '#typeurl-html5' ).parsley( 'validate' ) ).to.be( true );
+        $( '#typeurl-html5' ).parsley( 'validate').done( function( valid ) {
+          expect( valid ).to.be( true );
+        } );
       } )
       it ( 'url strict + global config overriding type message', function () {
         for ( var i in urls ) {
           $( '#typeurlstrict' ).val( urls[i].url );
-          expect( $( '#typeurlstrict' ).parsley( 'validate' ) ).to.be( urls[ i ].strict );
+          $( '#typeurlstrict' ).parsley( 'validate').done( function( valid ) {
+            expect( valid ).to.be( urls[ i ].strict );
+          } );
         }
         triggerSubmitValidation( '#typeurlstrict', 'foo' );
         expect( getErrorMessage( '#typeurlstrict', 'type') ).to.be( 'urlstrict global override.' );
@@ -487,8 +501,9 @@ var testSuite = function () {
         triggerSubmitValidation( '#equalTo', 'foobar' );
         expect( $( '#equalTo' ).hasClass( 'parsley-success' ) ).to.be( true );
         $( '#equalTo-model' ).val( 'baz' );
-        $( '#equalTo' ).parsley( 'validate' );
-        expect( $( '#equalTo' ).hasClass( 'parsley-error' ) ).to.be( true );
+        $( '#equalTo' ).parsley( 'validate').done(function() {
+          expect( $( '#equalTo' ).hasClass( 'parsley-error' ) ).to.be( true );
+        });
       } )
       it ( 'customvalidator', function () {
         triggerSubmitValidation( '#customvalidator', 'foo' );
@@ -502,36 +517,58 @@ var testSuite = function () {
       describe ( 'Test radio / checkboxes specific validators', function () {
         it ( 'mincheck', function () {
           $( '#checkbox-mincheck1' ).attr( 'checked', 'checked' );
-          expect( $( '#checkbox-mincheck1' ).parsley( 'validate' ) ).to.be( false );
+          $( '#checkbox-mincheck1' ).parsley( 'validate').done(function(valid) {
+            expect( valid ).to.be( false );
+          });
           expect( getErrorMessage( '#checkbox-mincheck1', 'mincheck') ).to.be( 'You must select at least 2 choices.' );
           $( '#checkbox-mincheck2' ).attr( 'checked', 'checked' );
-          expect( $( '#checkbox-mincheck1' ).parsley( 'validate' ) ).to.be( true );
+          $( '#checkbox-mincheck1' ).parsley( 'validate').done(function(valid) {
+            expect( valid ).to.be( true );
+          });
         } )
         it ( 'mincheck parsley-group', function () {
           $( '#checkbox-mincheckgroup1' ).attr( 'checked', 'checked' );
-          expect( $( '#checkbox-mincheckgroup1' ).parsley( 'validate' ) ).to.be( false );
+          $( '#checkbox-mincheckgroup1' ).parsley( 'validate').done(function(valid) {
+            expect( valid ).to.be( false );
+          });
           expect( getErrorMessage( '#checkbox-mincheckgroup1', 'mincheck') ).to.be( 'You must select at least 2 choices.' );
           $( '#checkbox-mincheckgroup2' ).attr( 'checked', 'checked' );
-          expect( $( '#checkbox-mincheckgroup1' ).parsley( 'validate' ) ).to.be( true );
+          $( '#checkbox-mincheckgroup1' ).parsley( 'validate').done(function(valid) {
+            expect( valid ).to.be( true );
+          });
         } )
         it ( 'maxcheck', function () {
           $( '#checkbox-maxcheck1' ).attr( 'checked', 'checked' );
-          expect( $( '#checkbox-maxcheck1' ).parsley( 'validate' ) ).to.be( true );
+          $( '#checkbox-maxcheck1' ).parsley( 'validate').done(function(valid) {
+            expect( valid ).to.be( true );
+          });
           $( '#checkbox-maxcheck2' ).attr( 'checked', 'checked' );
-          expect( $( '#checkbox-maxcheck1' ).parsley( 'validate' ) ).to.be( true );
+          $( '#checkbox-maxcheck1' ).parsley( 'validate').done(function(valid) {
+            expect( valid ).to.be( true );
+          });
           $( '#checkbox-maxcheck3' ).attr( 'checked', 'checked' );
-          expect( $( '#checkbox-maxcheck1' ).parsley( 'validate' ) ).to.be( false );
+          $( '#checkbox-maxcheck1' ).parsley( 'validate').done(function(valid) {
+            expect( valid ).to.be( false );
+          });
           expect( getErrorMessage( '#checkbox-maxcheck1', 'maxcheck') ).to.be( 'You must select 2 choices or less.' );
         } )
         it ( 'rangecheck', function () {
           $( '#checkbox-rangecheck1' ).attr( 'checked', 'checked' );
-          expect( $( '#checkbox-rangecheck1' ).parsley( 'validate' ) ).to.be( false );
+          $( '#checkbox-rangecheck1' ).parsley( 'validate' ).done(function(valid) {
+            expect( valid ).to.be( false );
+          });
           $( '#checkbox-rangecheck2' ).attr( 'checked', 'checked' );
-          expect( $( '#checkbox-rangecheck1' ).parsley( 'validate' ) ).to.be( true );
+          $( '#checkbox-rangecheck1' ).parsley( 'validate').done(function(valid) {
+            expect( valid ).to.be( true );
+          });
           $( '#checkbox-rangecheck3' ).attr( 'checked', 'checked' );
-          expect( $( '#checkbox-rangecheck1' ).parsley( 'validate' ) ).to.be( true );
+          $( '#checkbox-rangecheck1' ).parsley( 'validate' ).done(function(valid) {
+            expect( valid ).to.be( true );
+          });
           $( '#checkbox-rangecheck4' ).attr( 'checked', 'checked' );
-          expect( $( '#checkbox-rangecheck1' ).parsley( 'validate' ) ).to.be( false );
+          $( '#checkbox-rangecheck1' ).parsley( 'validate' ).done(function(valid) {
+            expect( valid ).to.be( false );
+          });
           expect( getErrorMessage( '#checkbox-rangecheck1', 'rangecheck') ).to.be( 'You must select between 2 and 3 choices.' );
         } )
       } )
@@ -543,11 +580,12 @@ var testSuite = function () {
 
           it ( 'Make an ajax request when remote-validator is used to passed url', function () {
             $( '#remote1' ).val( 'foobar' );
-            $( '#remote1' ).parsley( 'validate' );
-            expect( $.ajax.calledWithMatch( { type: "GET" } ) ).to.be( true );
-            expect( $.ajax.calledWithMatch( { url: "http://foo.bar" } ) ).to.be( true );
-            expect( $.ajax.calledWithMatch( { data: { remote1: "foobar" } } ) ).to.be( true );
-            expect( $.ajax.calledWithMatch( { dataType: "jsonp" } ) ).to.be( true );
+            $( '#remote1' ).parsley( 'validate').done(function() {
+              expect( $.ajax.calledWithMatch( { type: "GET" } ) ).to.be( true );
+              expect( $.ajax.calledWithMatch( { url: "http://foo.bar" } ) ).to.be( true );
+              expect( $.ajax.calledWithMatch( { data: { remote1: "foobar" } } ) ).to.be( true );
+              expect( $.ajax.calledWithMatch( { dataType: "jsonp" } ) ).to.be( true );
+            });
           } )
           it ( 'Test ajax call parameters overriding', function () {
             $( '#remote2' ).val( 'foo' );
@@ -565,57 +603,75 @@ var testSuite = function () {
           it ( 'Test success true', function ( done ) {
             sinon.stub( $, "ajax" ).yieldsTo( 'success' , "true" );
             $( '#remote2' ).val( 'foo' ).trigger( $.Event( 'change' ) );
-            expect( $( '#remote2' ).parsley( 'isValid' ) ).to.be( true )
+            $( '#remote2' ).parsley( 'isValid').done(function(valid) {
+              expect( valid ).to.be( true );
+            });
             done();
           } )
           it ( 'Test error 404', function ( done ) {
             sinon.stub( $, "ajax" ).yieldsTo( 'error' , "" );
             $( '#remote2' ).val( 'bar' ).trigger( $.Event( 'change' ) );
-            expect( $( '#remote2' ).parsley( 'isValid' ) ).to.be( false )
+            $( '#remote2' ).parsley( 'isValid' ).done(function(valid) {
+              expect( valid ).to.be( false );
+            });
             done();
           } )
           it ( 'Test success false', function ( done ) {
             sinon.stub( $, "ajax" ).yieldsTo( 'success' , "false" );
             $( '#remote2' ).val( 'baz' ).trigger( $.Event( 'change' ) );
-            expect( $( '#remote2' ).parsley( 'isValid' ) ).to.be( false )
+            $( '#remote2' ).parsley( 'isValid').done(function(valid) {
+              expect( valid ).to.be( false );
+            });
             done();
           } )
           it ( 'Test success 1', function ( done ) {
             sinon.stub( $, "ajax" ).yieldsTo( 'success' , "1" );
             $( '#remote2' ).val( 'foo' ).trigger( $.Event( 'change' ) );
-            expect( $( '#remote2' ).parsley( 'isValid' ) ).to.be( true )
+            $( '#remote2' ).parsley( 'isValid' ).done(function(valid) {
+              expect( valid ).to.be( true );
+            });
             done();
           } )
           it ( 'Test success 0', function ( done ) {
             sinon.stub( $, "ajax" ).yieldsTo( 'success' , "0" );
             $( '#remote2' ).val( 'bar' ).trigger( $.Event( 'change' ) );
-            expect( $( '#remote2' ).parsley( 'isValid' ) ).to.be( false )
+            $( '#remote2' ).parsley( 'isValid' ).done(function(valid) {
+              expect( valid ).to.be( false );
+            });
             done();
           } )
           it ( 'Test success with { success: "message" }', function ( done ) {
             sinon.stub( $, "ajax" ).yieldsTo( 'success' , "{\"success\": \"foo\"}" );
             $( '#remote2' ).val( 'baz' ).trigger( $.Event( 'change' ) );
-            expect( $( '#remote2' ).parsley( 'isValid' ) ).to.be( true )
+            $( '#remote2' ).parsley( 'isValid' ).done(function(valid) {
+              expect( valid ).to.be( true );
+            });
             done();
           } )
           it ( 'Test success with { error: "message" } + display message ', function ( done ) {
             sinon.stub( $, "ajax" ).yieldsTo( 'success' , "{\"error\": \"foobar\"}" );
             $( '#remote2' ).val( 'foo' ).trigger( $.Event( 'change' ) );
-            expect( $( '#remote2' ).parsley( 'isValid' ) ).to.be( false )
+            $( '#remote2' ).parsley( 'isValid').done(function(valid) {
+              expect( valid ).to.be( false );
+            });
             expect( getErrorMessage( '#remote2', 'remote') ).to.be( 'foobar' );
             done();
           } )
           it ( 'Test error 500 + error', function ( done ) {
             sinon.stub( $, "ajax" ).yieldsTo( 'error' , "{\"error\": \"foobarbaz\"}" );
             $( '#remote2' ).val( 'bar' ).trigger( $.Event( 'change' ) );
-            expect( $( '#remote2' ).parsley( 'isValid' ) ).to.be( false )
+            $( '#remote2' ).parsley( 'isValid').done(function(valid) {
+              expect( valid ).to.be( false );
+            });
             expect( getErrorMessage( '#remote2', 'remote') ).to.be( 'foobarbaz' );
             done();
           } )
           it ( 'Test error 500 + message', function ( done ) {
             sinon.stub( $, "ajax" ).yieldsTo( 'error' , "{\"message\": \"foo\"}" );
             $( '#remote2' ).val( 'baz' ).trigger( $.Event( 'change' ) );
-            expect( $( '#remote2' ).parsley( 'isValid' ) ).to.be( false )
+            $( '#remote2' ).parsley( 'isValid' ).done(function(valid) {
+              expect( valid ).to.be( false );
+            });
             expect( getErrorMessage( '#remote2', 'remote') ).to.be( 'foo' );
             done();
           } )
@@ -628,8 +684,8 @@ var testSuite = function () {
     } )
 
     /***************************************
-        override value with parsley-value
-    ***************************************/
+     override value with parsley-value
+     ***************************************/
     describe ( 'Override value with parsley-value' , function () {
       it ( 'required - parsley-value is empty, value is empty', function () {
         triggerSubmitValidation( '#datavalue1', '' );
@@ -643,8 +699,8 @@ var testSuite = function () {
     } )
 
     /***************************************
-          test options changes
-    ***************************************/
+     test options changes
+     ***************************************/
     describe ( 'Test options changes', function () {
       it ( 'Change min char validation tresshold', function () {
         // default min char validation is set to 3. here we expect an email value
@@ -668,32 +724,46 @@ var testSuite = function () {
         expect( $( '#change-show-errors-field1').hasClass( 'onFieldError') ).to.be( true );
         expect( $( '#change-show-errors-field1').hasClass( 'onFieldSuccess') ).to.be( false );
         // isValid for this field returns false
-        expect( $( '#change-show-errors-field1' ).parsley( 'isValid' ) ).to.be( false );
+        $( '#change-show-errors-field1' ).parsley( 'isValid' ).done(function(valid) {
+          expect( valid ).to.be( false );
+        });
         // second field is false too and nothing is shown in dom too
         $( '#change-show-errors-field2' ).val( 'foo' );
-        expect( $( '#change-show-errors-field2' ).parsley( 'validate' ) ).to.be( false );
+        $( '#change-show-errors-field2' ).parsley( 'validate').done(function(valid) {
+          expect( valid ).to.be( false );
+        });
         expect( $( '#change-show-errors-field2' ).hasClass( 'parsley-validated' ) ).to.be( true );
         expect( $( '#change-show-errors-field2' ).hasClass( 'parsley-error' ) ).to.be( false );
         expect( $( '#change-show-errors-field2' ).hasClass( 'parsley-success' ) ).to.be( false );
         // so form is false
-        expect( $( '#change-show-errors' ).parsley( 'validate' ) ).to.be( false );
+        $( '#change-show-errors' ).parsley( 'validate').done(function(valid) {
+          expect( valid ).to.be( false );
+        });
         // first field is valid now, but still nothing is shown
         $( '#change-show-errors-field1' ).val( 'foo@bar.baz' );
-        expect( $( '#change-show-errors-field1' ).parsley( 'validate' ) ).to.be( true );
+        $( '#change-show-errors-field1' ).parsley( 'validate' ).done(function(valid) {
+          expect( valid ).to.be( true );
+        });
         expect( $( '#change-show-errors-field2' ).hasClass( 'parsley-validated' ) ).to.be( true );
         expect( $( '#change-show-errors-field2' ).hasClass( 'parsley-error' ) ).to.be( false );
         expect( $( '#change-show-errors-field2' ).hasClass( 'parsley-success' ) ).to.be( false );
         expect( $( '#change-show-errors-field1').hasClass( 'onFieldSuccess') ).to.be( true );
         // form is still not valid
-        expect( $( '#change-show-errors' ).parsley( 'validate' ) ).to.be( false );
+        $( '#change-show-errors' ).parsley( 'validate' ).done(function(valid) {
+          expect( valid ).to.be( false );
+        });
         // second field finaly is valid
         $( '#change-show-errors-field2' ).val( 'foo.bar' );
-        expect( $( '#change-show-errors-field2' ).parsley( 'validate' ) ).to.be( true );
+        $( '#change-show-errors-field2' ).parsley( 'validate' ).done(function(valid) {
+          expect( valid ).to.be( true );
+        });
         expect( $( '#change-show-errors-field2' ).hasClass( 'parsley-validated' ) ).to.be( true );
         expect( $( '#change-show-errors-field2' ).hasClass( 'parsley-error' ) ).to.be( false );
         expect( $( '#change-show-errors-field2' ).hasClass( 'parsley-success' ) ).to.be( false );
         // and form is now valid
-        expect( $( '#change-show-errors' ).parsley( 'validate' ) ).to.be( true );
+        $( '#change-show-errors' ).parsley( 'validate' ).done(function(valid) {
+          expect( valid ).to.be( true );
+        });
       } )
       it ( 'Change differently errors messages for two same validators on different forms', function () {
         $( '#requiredchanged1-form' ).parsley( { messages: { required: "required 1" } } );
@@ -712,7 +782,7 @@ var testSuite = function () {
       } )
       it ( 'Change error handler', function () {
         $( '#errorsmanagement-form' ).parsley( {
-            successClass: 'parsley-great'
+          successClass: 'parsley-great'
           , errorClass: 'parsley-fail'
           , errors: {
             classHandler: function ( element, isRadioOrCheckbox ) {
@@ -739,22 +809,28 @@ var testSuite = function () {
     } )
 
     /***************************************
-         test field validation scenarios
-    ***************************************/
+     test field validation scenarios
+     ***************************************/
     describe ( 'Test field validation scenarios', function () {
       it ( 'Test multiple constraints/errors required field scenario', function () {
         var fieldHash = $( '#scenario-multiple-errors-and-required' ).parsley( 'getHash' );
-        expect( $( '#scenario-multiple-errors-and-required' ).parsley( 'validate' ) ).to.be( false );
+        $( '#scenario-multiple-errors-and-required' ).parsley( 'validate').done(function(valid) {
+          expect( valid ).to.be( false );
+        });
         expect( $( 'ul#' + fieldHash + ' li' ).length ).to.be( 1 );
         expect( $( 'ul#' + fieldHash + ' li' ).eq( 0 ).hasClass( 'required' ) ).to.be( true );
 
         $( '#scenario-multiple-errors-and-required' ).val( 'foo@bar.com' );
-        expect( $( '#scenario-multiple-errors-and-required' ).parsley( 'validate' ) ).to.be( false );
+        $( '#scenario-multiple-errors-and-required' ).parsley( 'validate' ).done(function(valid) {
+          expect( valid ).to.be( false );
+        });
         expect( $( 'ul#' + fieldHash + ' li' ).length ).to.be( 1 );
         expect( $( 'ul#' + fieldHash + ' li' ).eq( 0 ).hasClass( 'rangelength' ) ).to.be( true );
 
         $( '#scenario-multiple-errors-and-required' ).val( 'foo' );
-        expect( $( '#scenario-multiple-errors-and-required' ).parsley( 'validate' ) ).to.be( false );
+        $( '#scenario-multiple-errors-and-required' ).parsley( 'validate' ).done(function(valid) {
+          expect( valid ).to.be( false );
+        });
         expect( $( 'ul#' + fieldHash + ' li' ).length ).to.be( 2 );
       } )
       it ( 'Test keyup scenario for non-required field', function () {
@@ -807,7 +883,9 @@ var testSuite = function () {
         expect( $( '#scenario-keyup-when-notvalid' ).hasClass( 'parsley-success' ) ).to.be( false );
       } )
       it ( 'Test auto-change binding when select has errors', function () {
-        expect( $( '#scenario-validation-change-select' ).parsley( 'validate' ) ).to.be( false );
+        $( '#scenario-validation-change-select' ).parsley( 'validate' ).done(function(valid) {
+          expect( valid ).to.be( false );
+        });
         expect( $( '#scenario-validation-change-select' ).hasClass( 'parsley-error' ) ).to.be( true );
         $( '#scenario-validation-change-select' ).val( 'foo' ).trigger( $.Event( 'change' ) );
         expect( $( '#scenario-validation-change-select' ).hasClass( 'parsley-success' ) ).to.be( true );
@@ -853,7 +931,9 @@ var testSuite = function () {
         $( '#checkbox-maxcheckchange2' ).attr( 'checked', 'checked' );
         $( '#checkbox-maxcheckchange3' ).attr( 'checked', 'checked' ).trigger( $.Event( 'change' ) );
         expect( $( 'ul#' + $( '#checkbox-maxcheckchange1' ).parsley( 'getHash' ) ).length ).to.be( 0 );
-        expect( $( '#checkbox-maxcheckchange1' ).parsley( 'validate' ) ).to.be( false );
+        $( '#checkbox-maxcheckchange1' ).parsley( 'validate' ).done(function(valid) {
+          expect( valid ).to.be( false );
+        });
         expect( $( 'ul#' + $( '#checkbox-maxcheckchange1' ).parsley( 'getHash' ) ).length ).to.be( 1 );
         $( '#checkbox-maxcheckchange2' ).attr( 'checked', null ).trigger( $.Event( 'change' ) );
         expect( $( 'ul#' + $( '#checkbox-maxcheckchange1' ).parsley( 'getHash' ) ).length ).to.be( 0 );
@@ -870,15 +950,19 @@ var testSuite = function () {
         expect( $( 'ul#' + $( '#checkbox-maxcheck1' ).parsley( 'getHash' ) ).length ).to.be( 1 );
       } )
       it ( 'Test dynamic excluded fields validation', function () {
-        expect( $( '#dynamic-excluded' ).parsley( 'validate' ) ).to.be( false );
+        $( '#dynamic-excluded' ).parsley( 'validate').done(function(valid) {
+          expect( valid ).to.be( false );
+        });
         $( '#dynamic-disabled-email' ).attr( 'disabled', true );
-        expect( $( '#dynamic-excluded' ).parsley( 'validate' ) ).to.be( true );
+        $( '#dynamic-excluded' ).parsley( 'validate' ).done(function(valid) {
+          expect( valid ).to.be( true );
+        });
       } )
     } )
 
     /***************************************
-              test form validation
-    ***************************************/
+     test form validation
+     ***************************************/
     describe ( 'Test form validation', function () {
       it ( 'if a filed is not valid, form is not submitted', function () {
         $( '#validate2' ).val( '1234567' );
@@ -901,9 +985,13 @@ var testSuite = function () {
         expect( $( '#focus-form2' ).hasClass( 'focus-off' ) ).to.be( true );
       } )
       it ( 'test that hidden excluded inputs does not affect form validation', function () {
-        expect( $( '#hidden-input-form' ).parsley( 'validate' ) ).to.be( false );
+        $( '#hidden-input-form' ).parsley( 'validate' ).done(function(valid) {
+          expect( valid ).to.be( false );
+        });
         $( '#hidden-input1' ).val( 'foo@bar.baz' );
-        expect( $( '#hidden-input-form' ).parsley( 'validate' ) ).to.be( true );
+        $( '#hidden-input-form' ).parsley( 'validate' ).done(function(valid) {
+          expect( valid ).to.be( true );
+        });
       } )
       it ( 'test parsley(\'destroy\') on ParsleyField', function () {
         expect( $( '#destroy-email' ).hasClass( 'parsley-validated' ) ).to.be( true );
@@ -925,28 +1013,36 @@ var testSuite = function () {
         expect( $( '#destroy-multiple' ).hasClass( 'parsley-error' ) ).to.be( false );
       } )
       it ( 'test parsley(\'reset\')', function () {
-          $('#reset').parsley('validate');
-          expect( $('#reset-email').hasClass('parsley-error') ).to.be( true );
-          expect( $('#reset-textarea').hasClass('parsley-error') ).to.be( true );
-          $('#reset').parsley('reset');
-          expect( $('#reset-email').hasClass('parsley-error')).to.be( false );
-          expect( $('#reset-textarea').hasClass('parsley-error')).to.be( false );
+        $('#reset').parsley('validate');
+        expect( $('#reset-email').hasClass('parsley-error') ).to.be( true );
+        expect( $('#reset-textarea').hasClass('parsley-error') ).to.be( true );
+        $('#reset').parsley('reset');
+        expect( $('#reset-email').hasClass('parsley-error')).to.be( false );
+        expect( $('#reset-textarea').hasClass('parsley-error')).to.be( false );
       })
       it ( 'test parsley dynamic add item', function () {
         $( '#dynamic-form' ).append( '<input type="text" parsley-type="email" class="dynamic-email" parsley-trigger="change" value="foo" />' );
         var ParsleyForm = $( '#dynamic-form' ).parsley();
         expect( ParsleyForm.items.length ).to.be( 0 );
-        expect( $( '#dynamic-form' ).parsley( 'validate' ) ).to.be( true );
+        $( '#dynamic-form' ).parsley( 'validate' ).done(function(valid) {
+          expect( valid ).to.be( true );
+        });
         $( '#dynamic-form' ).parsley( 'addItem', '.dynamic-email' );
         expect( ParsleyForm.items.length ).to.be( 1 );
-        expect( $( '#dynamic-form' ).parsley( 'validate' ) ).to.be( false );
+        $( '#dynamic-form' ).parsley( 'validate' ).done(function(valid) {
+          expect( valid ).to.be( false );
+        });
         $( '.dynamic-email' ).val( 'foo@bar.baz' );
-        expect( $( '#dynamic-form' ).parsley( 'validate' ) ).to.be( true );
+        $( '#dynamic-form' ).parsley( 'validate' ).done(function(valid) {
+          expect( valid ).to.be( true );
+        });
         $( '.dynamic-email' ).val( 'foo' );
         $( '#dynamic-form' ).parsley( 'removeItem', '.dynamic-email' );
         expect( ParsleyForm.items.length ).to.be( 0 );
         expect( $( '.dynamic-email' ).hasClass( 'parsley-validated' ) ).to.be( false );
-        expect( $( '#dynamic-form' ).parsley( 'validate' ) ).to.be( true );
+        $( '#dynamic-form' ).parsley( 'validate' ).done(function(valid) {
+          expect( valid ).to.be( true );
+        });
       } )
       it ( 'test adding constraint on the fly', function () {
         $( '#onthefly' ).parsley( 'addConstraint', { type: "email" } ).val( 'foo' );
@@ -971,26 +1067,34 @@ var testSuite = function () {
         expect( $( '#onthefly' ).hasClass( 'parsley-validated' ) ).to.be( true );
       } )
       it ( 'test setting custom error container within parsley-attributes', function () {
-        expect( $( '#dataerrorcontainer-form' ).parsley( 'validate' ) ).to.be( false );
+        $( '#dataerrorcontainer-form' ).parsley( 'validate' ).done(function(valid) {
+          expect( valid ).to.be( false );
+        });
         expect( $( '#mycustomerrorcontainer ul.parsley-error-list' ).length ).to.be( 1 );
       } )
       it ( 'test isValid', function () {
-        expect( $( '#isValid-form' ).parsley( 'isValid' ) ).to.be( false );
+        $( '#isValid-form' ).parsley( 'isValid' ).done(function(valid) {
+          expect( valid ).to.be( false );
+        });
         expect( $( '#isValid-field' ).hasClass( 'parsley-success' ) ).to.be( false );
         expect( $( '#isValid-field' ).hasClass( 'parsley-error' ) ).to.be( false );
         $( '#isValid-field' ).val( 'foo' );
-        expect( $( '#isValid-form' ).parsley( 'isValid' ) ).to.be( true );
+        $( '#isValid-form' ).parsley( 'isValid' ).done(function(valid) {
+          expect( valid ).to.be( true );
+        });
         expect( $( '#isValid-field' ).hasClass( 'parsley-success' ) ).to.be( false );
         expect( $( '#isValid-field' ).hasClass( 'parsley-error' ) ).to.be( false );
         $( '#isValid-field' ).val( '' );
-        expect( $( '#isValid-form' ).parsley( 'validate' ) ).to.be( false );
+        $( '#isValid-form' ).parsley( 'validate' ).done(function(valid) {
+          expect( valid ).to.be( false );
+        });
         expect( $( '#isValid-field' ).hasClass( 'parsley-error' ) ).to.be( true );
       } )
     } )
 
     /***************************************
-              test custom functions
-    ***************************************/
+     test custom functions
+     ***************************************/
     describe ( 'Test custom listeners', function () {
       describe ( 'Test overriding listeners in config', function () {
         it ( 'test onFieldValidate()', function () {
@@ -1012,7 +1116,9 @@ var testSuite = function () {
         it ( 'test onFieldSuccess()', function () {
           // if onFieldSuccess returns false, consider field as invalid
           $( '#onFieldValidate2' ).val( 'foo@foo.foo' );
-          expect( $( '#onFieldValidate-form' ).parsley( 'validate' ) ).to.be( false );
+          $( '#onFieldValidate-form' ).parsley( 'validate' ).done(function(valid) {
+            expect( valid ).to.be( false );
+          });
           expect( $( '#onFieldValidate2' ).hasClass( 'success-foo-bar' ) ).to.be( false );
 
           $( '#onFieldValidate2' ).val( 'foo@baz.baz' );
@@ -1042,22 +1148,26 @@ var testSuite = function () {
       } )
       describe ( 'Test some typical use cases with listeners', function () {
         it( 'Test onFieldValidate could reset Parsley validation with return true;', function () {
-           $( '#onFieldValidatetrue' ).val( 'foo@bar.com' );
-           expect( $( '#onFieldValidatetrue-form' ).parsley( 'validate' ) ).to.be( false );
+          $( '#onFieldValidatetrue' ).val( 'foo@bar.com' );
+          $( '#onFieldValidatetrue-form' ).parsley( 'validate' ).done(function(valid) {
+            expect( valid ).to.be( false );
+          });
 
-           // do not validate #onFieldValidatefalse
-           $( '#onFieldValidatetrue-form' ).parsley( 'addListener', {
-             onFieldValidate: function ( elem ) {
-               if ( $( elem ).attr( 'id' ) === "onFieldValidatefalse" ) {
-                 return true;
-               }
+          // do not validate #onFieldValidatefalse
+          $( '#onFieldValidatetrue-form' ).parsley( 'addListener', {
+            onFieldValidate: function ( elem ) {
+              if ( $( elem ).attr( 'id' ) === "onFieldValidatefalse" ) {
+                return true;
+              }
 
-               return false;
-             }
-           } )
+              return false;
+            }
+          } )
 
-           // even with #onFieldValidatefalse invalid, validation is ok
-           expect( $( '#onFieldValidatetrue-form' ).parsley( 'validate' ) ).to.be( true );
+          // even with #onFieldValidatefalse invalid, validation is ok
+          $( '#onFieldValidatetrue-form' ).parsley( 'validate' ).done(function(valid) {
+            expect( valid ).to.be( true );
+          });
         } )
         it( 'Do not submit a form even if Parsley valid, with custom onFormValidate callback', function () {
           var global;
@@ -1071,20 +1181,26 @@ var testSuite = function () {
           } );
 
           $( '#onFormValidateCustom-field' ).val( 'correct@email.ext' );
-          expect( $( '#onFormValidateCustom' ).parsley( 'validate' ) ).to.be( true );
+          $( '#onFormValidateCustom' ).parsley( 'validate' ).done(function(valid) {
+            expect( valid ).to.be( true );
+          });
 
           global = false;
-          expect( $( '#onFormValidateCustom' ).parsley( 'validate' ) ).to.be( false );
+          $( '#onFormValidateCustom' ).parsley( 'validate' ).done(function(valid) {
+            expect( valid ).to.be( false );
+          });
         } )
       } )
     } )
 
-   /***************************************
-    test radio & checkboxes inputs behavior
-    ***************************************/
+    /***************************************
+     test radio & checkboxes inputs behavior
+     ***************************************/
     describe ( 'Test radio & checkboxes inputs', function () {
       it ( 'Test that radio or checkbox isRequired constraint apply once one radio / checkbox button or more is required', function () {
-        expect( $( '#radiocheckboxes' ).parsley( 'validate' ) ).to.be( false );
+        $( '#radiocheckboxes' ).parsley( 'validate' ).done(function(valid) {
+          expect( valid ).to.be( false );
+        });
       } )
       it ( 'Test that error message goes only once and after last radio / checkbox of the group', function () {
         expect( $( '#check2' ).parsley( 'getHash' ) ).to.be( $( '#check1' ).parsley( 'getHash' ) );
@@ -1093,395 +1209,405 @@ var testSuite = function () {
       it ( 'Test that if a checkbox or radio is selected, isRequired validation pass', function () {
         $( '#radio1' ).attr( 'checked', 'checked' );
         $( '#check1' ).attr( 'checked', 'checked' );
-        expect( $( '#radiocheckboxes' ).parsley( 'validate' ) ).to.be( true );
+        $( '#radiocheckboxes' ).parsley( 'validate' ).done(function(valid) {
+          expect( valid ).to.be( true );
+        });
       } )
     } )
 
     /***************************************
-          test parsley DOM-API namespace
+     test parsley DOM-API namespace
      ***************************************/
-     describe ( 'test parsley DOM-API namespace', function () {
-       it ( 'Test overriding default parsley DOM-API', function () {
-         $( '#dom-api-input' ).val( 'foo' );
-         expect( $( '#dom-api' ).parsley( 'validate' ) ).to.be( false );
-         $( '#dom-api-input' ).val( 'foobarbazquxbux' );
-         expect( $( '#dom-api' ).parsley( 'validate' ) ).to.be( true );
-       } )
-     } )
+    describe ( 'test parsley DOM-API namespace', function () {
+      it ( 'Test overriding default parsley DOM-API', function () {
+        $( '#dom-api-input' ).val( 'foo' );
+        $( '#dom-api' ).parsley( 'validate' ).done(function(valid) {
+          expect( valid ).to.be( false );
+        });
+        $( '#dom-api-input' ).val( 'foobarbazquxbux' );
+        $( '#dom-api' ).parsley( 'validate' ).done(function(valid) {
+          expect( valid ).to.be( true );
+        });
+      } )
+    } )
     /***************************************
-            test parsley.extend.js
+     test parsley.extend.js
      ***************************************/
-     describe ( 'Test Parsley extend', function () {
-       it ( 'minwords validation', function () {
-          triggerSubmitValidation( '#minwords', 'foo bar' );
-          expect( $( '#minwords' ).hasClass( 'parsley-error' ) ).to.be( true );
-          expect( getErrorMessage( '#minwords', 'minwords') ).to.be( 'This value should have 6 words at least.' );
-          triggerSubmitValidation( '#minwords', 'foo bar baz foo bar baz' );
-          expect( $( '#minwords' ).hasClass( 'parsley-success' ) ).to.be( true );
-       } )
-       it ( 'maxwords validation', function () {
-          triggerSubmitValidation( '#maxwords', 'foo bar baz foo bar baz foo bar baz foo' );
-          expect( $( '#maxwords' ).hasClass( 'parsley-error' ) ).to.be( true );
-          expect( getErrorMessage( '#maxwords', 'maxwords') ).to.be( 'This value should have 6 words maximum.' );
-          triggerSubmitValidation( '#maxwords', 'foo bar baz foo bar baz' );
-          expect( $( '#maxwords' ).hasClass( 'parsley-success' ) ).to.be( true );
-       } )
-       it ( 'rangewords validation', function () {
-          triggerSubmitValidation( '#rangewords', 'foo bar baz foo bar baz foo bar baz foo foo bar' );
-          expect( $( '#rangewords' ).hasClass( 'parsley-error' ) ).to.be( true );
-          expect( getErrorMessage( '#rangewords', 'rangewords') ).to.be( 'This value should have between 6 and 10 words.' );
-          triggerSubmitValidation( '#rangewords', 'foo bar baz foo bar baz foo' );
-          expect( $( '#rangewords' ).hasClass( 'parsley-success' ) ).to.be( true );
-       } )
-       it ( 'inlist validation', function () {
-          triggerSubmitValidation( '#inList', 'invalid' );
-          expect( $( '#inList' ).hasClass( 'parsley-error' ) ).to.be( true );
-          triggerSubmitValidation( '#inList', 'false' );
-          expect( $( '#inList' ).hasClass( 'parsley-error' ) ).to.be( true );
-          triggerSubmitValidation( '#inList', 'true' );
-          expect( $( '#inList' ).hasClass( 'parsley-success' ) ).to.be( true );
-          triggerSubmitValidation( '#inList', 'one' );
-          expect( $( '#inList' ).hasClass( 'parsley-success' ) ).to.be( true );
-          triggerSubmitValidation( '#inList', 'value with spaces' );
-          expect( $( '#inList' ).hasClass( 'parsley-success' ) ).to.be( true );
-
-          triggerSubmitValidation( '#inListSingleValue', 'true' );
-          expect( $( '#inListSingleValue' ).hasClass( 'parsley-success' ) ).to.be( true );
-
-          triggerSubmitValidation( '#inListEmpty', 'foo' );
-          expect( $( '#inListEmpty' ).hasClass( 'parsley-error' ) ).to.be( true );
-
-          triggerSubmitValidation( '#inListSingleComma', 'value' );
-          expect( $( '#inListSingleComma' ).hasClass( 'parsley-error' ) ).to.be( true );
-
-          triggerSubmitValidation( '#inListCustomDelimiter', 'foo bar' );
-          expect( $( '#inListCustomDelimiter' ).hasClass( 'parsley-success' ) ).to.be( true );
-       } )
-       it ( 'greaterThan', function () {
-         triggerSubmitValidation( '#greaterThan', '1' );
-         expect( $( '#greaterThan' ).hasClass( 'parsley-error' ) ).to.be( true );
-         expect( getErrorMessage( '#greaterThan', 'greaterThan') ).to.be( 'This value should be greater than #greaterThan-model.' );
-         triggerSubmitValidation( '#greaterThan', '2' );
-         expect( $( '#greaterThan' ).hasClass( 'parsley-success' ) ).to.be( true );
-         $( '#greaterThan-model' ).val( '5' );
-         expect( $( '#greaterThan' ).parsley( 'validate' ) ).to.be( false );
-       } )
-       it ( 'lessThan', function () {
-         triggerSubmitValidation( '#lessThan', '5' );
-         expect( $( '#lessThan' ).hasClass( 'parsley-error' ) ).to.be( true );
-         expect( getErrorMessage( '#lessThan', 'lessThan') ).to.be( 'This value should be less than #lessThan-model.' );
-         triggerSubmitValidation( '#lessThan', '1' );
-         expect( $( '#lessThan' ).hasClass( 'parsley-success' ) ).to.be( true );
-         $( '#lessThan-model' ).val( '1' );
-         expect( $( '#lessThan' ).parsley( 'validate' ) ).to.be( false );
-       } )
-       it ( 'beforeDate', function () {
-         triggerSubmitValidation( '#beforeDate', '04/15/2015' );
-         expect( $( '#beforeDate' ).hasClass( 'parsley-error' ) ).to.be( true );
-         expect( getErrorMessage( '#beforeDate', 'beforeDate') ).to.be( 'This date should be before #beforeDate-model.' );
-         triggerSubmitValidation( '#beforeDate', '4/15/1990' );
-         expect( $( '#beforeDate' ).hasClass( 'parsley-success' ) ).to.be( true );
-       } )
-       it ( 'afterDate', function () {
-         triggerSubmitValidation( '#afterDate', '4/15/1990' );
-         expect( $( '#afterDate' ).hasClass( 'parsley-error' ) ).to.be( true );
-         expect( getErrorMessage( '#afterDate', 'afterDate') ).to.be( 'This date should be after #afterDate-model.' );
-         triggerSubmitValidation( '#afterDate', '04/15/2015' );
-         expect( $( '#afterDate' ).hasClass( 'parsley-success' ) ).to.be( true );
-       } )
-       it ( 'luhn', function () {
-         triggerSubmitValidation( '#luhn', '4000000000000000' );
-         expect( $( '#luhn' ).hasClass( 'parsley-error' ) ).to.be( true );
-         expect( getErrorMessage( '#luhn', 'luhn') ).to.be( 'This value should pass the luhn test.' );
-         triggerSubmitValidation( '#luhn', '4000000000000002' );
-         expect( $( '#luhn' ).hasClass( 'parsley-success' ) ).to.be( true );
-       } )
-       it ( 'americanDate', function () {
-    	 triggerSubmitValidation( '#americanDate', '28/02/2012' );
-    	 expect( $( '#americanDate' ).hasClass( 'parsley-error' ) ).to.be( true );
-    	 expect( getErrorMessage( '#americanDate', 'americanDate') ).to.be( 'This value should be a valid date (MM/DD/YYYY).' );
-    	 triggerSubmitValidation( '#americanDate', '02/08/2012' );
-    	 expect( $( '#americanDate' ).hasClass( 'parsley-success' ) ).to.be( true );
-    	 triggerSubmitValidation( '#americanDate', '10/08/2012' );
-    	 expect( $( '#americanDate' ).hasClass( 'parsley-success' ) ).to.be( true );
-    	 triggerSubmitValidation( '#americanDate', '2/8/12' );
-    	 expect( $( '#americanDate' ).hasClass( 'parsley-success' ) ).to.be( true );
-    	 triggerSubmitValidation( '#americanDate', '02-08-2012' );
-    	 expect( $( '#americanDate' ).hasClass( 'parsley-success' ) ).to.be( true );
-    	 triggerSubmitValidation( '#americanDate', '2-8-12' );
-    	 expect( $( '#americanDate' ).hasClass( 'parsley-success' ) ).to.be( true );
-    	 triggerSubmitValidation( '#americanDate', '02.08.2012' );
-    	 expect( $( '#americanDate' ).hasClass( 'parsley-success' ) ).to.be( true );
-    	 triggerSubmitValidation( '#americanDate', '2.8.12' );
-    	 expect( $( '#americanDate' ).hasClass( 'parsley-success' ) ).to.be( true );
-       } )
-     } )
-     describe ( 'Test Parsley l10n es', function () {
-       it ( 'es_dni', function () {
-    	 triggerSubmitValidation( '#es_dni', '12345678Z' );
-    	 expect( $( '#es_dni' ).hasClass( 'parsley-success' ) ).to.be( true );
-
-    	 triggerSubmitValidation( '#es_dni', '00000000T' );
-    	 expect( $( '#es_dni' ).hasClass( 'parsley-success' ) ).to.be( true );
-
-    	 triggerSubmitValidation( '#es_dni', '0T' );
-    	 expect( $( '#es_dni' ).hasClass( 'parsley-success' ) ).to.be( true );
-
-    	 triggerSubmitValidation( '#es_dni', '00000000-T' );
-    	 expect( $( '#es_dni' ).hasClass( 'parsley-success' ) ).to.be( true );
-
-    	 triggerSubmitValidation( '#es_dni', '12345678Z' );
-    	 expect( $( '#es_dni' ).hasClass( 'parsley-success' ) ).to.be( true );
-
-    	 triggerSubmitValidation( '#es_dni', '87654321J' );
-    	 expect( $( '#es_dni' ).hasClass( 'parsley-error' ) ).to.be( true );
-    	 expect( getErrorMessage( '#es_dni', 'es_dni') ).to.be( 'This value should be a valid DNI (Example: 00000000T).' );
-
-    	 triggerSubmitValidation( '#es_dni', '123456781' );
-    	 expect( $( '#es_dni' ).hasClass( 'parsley-error' ) ).to.be( true );
-    	 expect( getErrorMessage( '#es_dni', 'es_dni') ).to.be( 'This value should be a valid DNI (Example: 00000000T).' );
-
-    	 triggerSubmitValidation( '#es_dni', 'X12345678' );
-    	 expect( $( '#es_dni' ).hasClass( 'parsley-error' ) ).to.be( true );
-    	 expect( getErrorMessage( '#es_dni', 'es_dni') ).to.be( 'This value should be a valid DNI (Example: 00000000T).' );
-
-    	 triggerSubmitValidation( '#es_dni', '123K' );
-    	 expect( $( '#es_dni' ).hasClass( 'parsley-error' ) ).to.be( true );
-    	 expect( getErrorMessage( '#es_dni', 'es_dni') ).to.be( 'This value should be a valid DNI (Example: 00000000T).' );
-
-    	 triggerSubmitValidation( '#es_dni', '43215678X' );
-    	 expect( $( '#es_dni' ).hasClass( 'parsley-error' ) ).to.be( true );
-    	 expect( getErrorMessage( '#es_dni', 'es_dni') ).to.be( 'This value should be a valid DNI (Example: 00000000T).' );
-       } )
-       it ( 'es_postalcode', function () {
-    	 triggerSubmitValidation( '#es_postalcode', '28080' );
-    	 expect( $( '#es_postalcode' ).hasClass( 'parsley-success' ) ).to.be( true );
-
-    	 triggerSubmitValidation( '#es_postalcode', '35500' );
-    	 expect( $( '#es_postalcode' ).hasClass( 'parsley-success' ) ).to.be( true );
-
-    	 triggerSubmitValidation( '#es_postalcode', '12012' );
-    	 expect( $( '#es_postalcode' ).hasClass( 'parsley-success' ) ).to.be( true );
-
-    	 triggerSubmitValidation( '#es_postalcode', '25120' );
-    	 expect( $( '#es_postalcode' ).hasClass( 'parsley-success' ) ).to.be( true );
-
-    	 triggerSubmitValidation( '#es_postalcode', '59000' );
-    	 expect( $( '#es_postalcode' ).hasClass( 'parsley-error' ) ).to.be( true );
-    	 expect( getErrorMessage( '#es_postalcode', 'es_postalcode') ).to.be( 'This value should be a valid spanish postal code (Example: 28080).' );
-
-    	 triggerSubmitValidation( '#es_postalcode', '10' );
-    	 expect( $( '#es_postalcode' ).hasClass( 'parsley-error' ) ).to.be( true );
-    	 expect( getErrorMessage( '#es_postalcode', 'es_postalcode') ).to.be( 'This value should be a valid spanish postal code (Example: 28080).' );
-
-    	 triggerSubmitValidation( '#es_postalcode', 'X123' );
-    	 expect( $( '#es_postalcode' ).hasClass( 'parsley-error' ) ).to.be( true );
-    	 expect( getErrorMessage( '#es_postalcode', 'es_postalcode') ).to.be( 'This value should be a valid spanish postal code (Example: 28080).' );
-       } )
-       it ( 'es_ssn', function () {
-    	 triggerSubmitValidation( '#es_ssn', '281234567840' );
-    	 expect( $( '#es_ssn' ).hasClass( 'parsley-success' ) ).to.be( true );
-
-    	 triggerSubmitValidation( '#es_ssn', '351234567825' );
-    	 expect( $( '#es_ssn' ).hasClass( 'parsley-success' ) ).to.be( true );
-
-    	 triggerSubmitValidation( '#es_ssn', '35/12345678/25' );
-    	 expect( $( '#es_ssn' ).hasClass( 'parsley-success' ) ).to.be( true );
-
-         triggerSubmitValidation( '#es_ssn', '720111361735');
-    	 expect( $( '#es_ssn' ).hasClass( 'parsley-error' ) ).to.be( true );
-    	 expect( getErrorMessage( '#es_ssn', 'es_ssn') ).to.be( 'This value should be a valid spanish social security number.' );
+    describe ( 'Test Parsley extend', function () {
+      it ( 'minwords validation', function () {
+        triggerSubmitValidation( '#minwords', 'foo bar' );
+        expect( $( '#minwords' ).hasClass( 'parsley-error' ) ).to.be( true );
+        expect( getErrorMessage( '#minwords', 'minwords') ).to.be( 'This value should have 6 words at least.' );
+        triggerSubmitValidation( '#minwords', 'foo bar baz foo bar baz' );
+        expect( $( '#minwords' ).hasClass( 'parsley-success' ) ).to.be( true );
+      } )
+      it ( 'maxwords validation', function () {
+        triggerSubmitValidation( '#maxwords', 'foo bar baz foo bar baz foo bar baz foo' );
+        expect( $( '#maxwords' ).hasClass( 'parsley-error' ) ).to.be( true );
+        expect( getErrorMessage( '#maxwords', 'maxwords') ).to.be( 'This value should have 6 words maximum.' );
+        triggerSubmitValidation( '#maxwords', 'foo bar baz foo bar baz' );
+        expect( $( '#maxwords' ).hasClass( 'parsley-success' ) ).to.be( true );
+      } )
+      it ( 'rangewords validation', function () {
+        triggerSubmitValidation( '#rangewords', 'foo bar baz foo bar baz foo bar baz foo foo bar' );
+        expect( $( '#rangewords' ).hasClass( 'parsley-error' ) ).to.be( true );
+        expect( getErrorMessage( '#rangewords', 'rangewords') ).to.be( 'This value should have between 6 and 10 words.' );
+        triggerSubmitValidation( '#rangewords', 'foo bar baz foo bar baz foo' );
+        expect( $( '#rangewords' ).hasClass( 'parsley-success' ) ).to.be( true );
+      } )
+      it ( 'inlist validation', function () {
+        triggerSubmitValidation( '#inList', 'invalid' );
+        expect( $( '#inList' ).hasClass( 'parsley-error' ) ).to.be( true );
+        triggerSubmitValidation( '#inList', 'false' );
+        expect( $( '#inList' ).hasClass( 'parsley-error' ) ).to.be( true );
+        triggerSubmitValidation( '#inList', 'true' );
+        expect( $( '#inList' ).hasClass( 'parsley-success' ) ).to.be( true );
+        triggerSubmitValidation( '#inList', 'one' );
+        expect( $( '#inList' ).hasClass( 'parsley-success' ) ).to.be( true );
+        triggerSubmitValidation( '#inList', 'value with spaces' );
+        expect( $( '#inList' ).hasClass( 'parsley-success' ) ).to.be( true );
+
+        triggerSubmitValidation( '#inListSingleValue', 'true' );
+        expect( $( '#inListSingleValue' ).hasClass( 'parsley-success' ) ).to.be( true );
+
+        triggerSubmitValidation( '#inListEmpty', 'foo' );
+        expect( $( '#inListEmpty' ).hasClass( 'parsley-error' ) ).to.be( true );
+
+        triggerSubmitValidation( '#inListSingleComma', 'value' );
+        expect( $( '#inListSingleComma' ).hasClass( 'parsley-error' ) ).to.be( true );
+
+        triggerSubmitValidation( '#inListCustomDelimiter', 'foo bar' );
+        expect( $( '#inListCustomDelimiter' ).hasClass( 'parsley-success' ) ).to.be( true );
+      } )
+      it ( 'greaterThan', function () {
+        triggerSubmitValidation( '#greaterThan', '1' );
+        expect( $( '#greaterThan' ).hasClass( 'parsley-error' ) ).to.be( true );
+        expect( getErrorMessage( '#greaterThan', 'greaterThan') ).to.be( 'This value should be greater than #greaterThan-model.' );
+        triggerSubmitValidation( '#greaterThan', '2' );
+        expect( $( '#greaterThan' ).hasClass( 'parsley-success' ) ).to.be( true );
+        $( '#greaterThan-model' ).val( '5' );
+        $( '#greaterThan' ).parsley( 'validate' ).done(function(valid) {
+          expect( valid ).to.be( false );
+        });
+      } )
+      it ( 'lessThan', function () {
+        triggerSubmitValidation( '#lessThan', '5' );
+        expect( $( '#lessThan' ).hasClass( 'parsley-error' ) ).to.be( true );
+        expect( getErrorMessage( '#lessThan', 'lessThan') ).to.be( 'This value should be less than #lessThan-model.' );
+        triggerSubmitValidation( '#lessThan', '1' );
+        expect( $( '#lessThan' ).hasClass( 'parsley-success' ) ).to.be( true );
+        $( '#lessThan-model' ).val( '1' );
+        $( '#lessThan' ).parsley( 'validate' ).done(function(valid) {
+          expect( valid ).to.be( false );
+        });
+      } )
+      it ( 'beforeDate', function () {
+        triggerSubmitValidation( '#beforeDate', '04/15/2015' );
+        expect( $( '#beforeDate' ).hasClass( 'parsley-error' ) ).to.be( true );
+        expect( getErrorMessage( '#beforeDate', 'beforeDate') ).to.be( 'This date should be before #beforeDate-model.' );
+        triggerSubmitValidation( '#beforeDate', '4/15/1990' );
+        expect( $( '#beforeDate' ).hasClass( 'parsley-success' ) ).to.be( true );
+      } )
+      it ( 'afterDate', function () {
+        triggerSubmitValidation( '#afterDate', '4/15/1990' );
+        expect( $( '#afterDate' ).hasClass( 'parsley-error' ) ).to.be( true );
+        expect( getErrorMessage( '#afterDate', 'afterDate') ).to.be( 'This date should be after #afterDate-model.' );
+        triggerSubmitValidation( '#afterDate', '04/15/2015' );
+        expect( $( '#afterDate' ).hasClass( 'parsley-success' ) ).to.be( true );
+      } )
+      it ( 'luhn', function () {
+        triggerSubmitValidation( '#luhn', '4000000000000000' );
+        expect( $( '#luhn' ).hasClass( 'parsley-error' ) ).to.be( true );
+        expect( getErrorMessage( '#luhn', 'luhn') ).to.be( 'This value should pass the luhn test.' );
+        triggerSubmitValidation( '#luhn', '4000000000000002' );
+        expect( $( '#luhn' ).hasClass( 'parsley-success' ) ).to.be( true );
+      } )
+      it ( 'americanDate', function () {
+        triggerSubmitValidation( '#americanDate', '28/02/2012' );
+        expect( $( '#americanDate' ).hasClass( 'parsley-error' ) ).to.be( true );
+        expect( getErrorMessage( '#americanDate', 'americanDate') ).to.be( 'This value should be a valid date (MM/DD/YYYY).' );
+        triggerSubmitValidation( '#americanDate', '02/08/2012' );
+        expect( $( '#americanDate' ).hasClass( 'parsley-success' ) ).to.be( true );
+        triggerSubmitValidation( '#americanDate', '10/08/2012' );
+        expect( $( '#americanDate' ).hasClass( 'parsley-success' ) ).to.be( true );
+        triggerSubmitValidation( '#americanDate', '2/8/12' );
+        expect( $( '#americanDate' ).hasClass( 'parsley-success' ) ).to.be( true );
+        triggerSubmitValidation( '#americanDate', '02-08-2012' );
+        expect( $( '#americanDate' ).hasClass( 'parsley-success' ) ).to.be( true );
+        triggerSubmitValidation( '#americanDate', '2-8-12' );
+        expect( $( '#americanDate' ).hasClass( 'parsley-success' ) ).to.be( true );
+        triggerSubmitValidation( '#americanDate', '02.08.2012' );
+        expect( $( '#americanDate' ).hasClass( 'parsley-success' ) ).to.be( true );
+        triggerSubmitValidation( '#americanDate', '2.8.12' );
+        expect( $( '#americanDate' ).hasClass( 'parsley-success' ) ).to.be( true );
+      } )
+    } )
+    describe ( 'Test Parsley l10n es', function () {
+      it ( 'es_dni', function () {
+        triggerSubmitValidation( '#es_dni', '12345678Z' );
+        expect( $( '#es_dni' ).hasClass( 'parsley-success' ) ).to.be( true );
+
+        triggerSubmitValidation( '#es_dni', '00000000T' );
+        expect( $( '#es_dni' ).hasClass( 'parsley-success' ) ).to.be( true );
+
+        triggerSubmitValidation( '#es_dni', '0T' );
+        expect( $( '#es_dni' ).hasClass( 'parsley-success' ) ).to.be( true );
+
+        triggerSubmitValidation( '#es_dni', '00000000-T' );
+        expect( $( '#es_dni' ).hasClass( 'parsley-success' ) ).to.be( true );
+
+        triggerSubmitValidation( '#es_dni', '12345678Z' );
+        expect( $( '#es_dni' ).hasClass( 'parsley-success' ) ).to.be( true );
+
+        triggerSubmitValidation( '#es_dni', '87654321J' );
+        expect( $( '#es_dni' ).hasClass( 'parsley-error' ) ).to.be( true );
+        expect( getErrorMessage( '#es_dni', 'es_dni') ).to.be( 'This value should be a valid DNI (Example: 00000000T).' );
+
+        triggerSubmitValidation( '#es_dni', '123456781' );
+        expect( $( '#es_dni' ).hasClass( 'parsley-error' ) ).to.be( true );
+        expect( getErrorMessage( '#es_dni', 'es_dni') ).to.be( 'This value should be a valid DNI (Example: 00000000T).' );
+
+        triggerSubmitValidation( '#es_dni', 'X12345678' );
+        expect( $( '#es_dni' ).hasClass( 'parsley-error' ) ).to.be( true );
+        expect( getErrorMessage( '#es_dni', 'es_dni') ).to.be( 'This value should be a valid DNI (Example: 00000000T).' );
+
+        triggerSubmitValidation( '#es_dni', '123K' );
+        expect( $( '#es_dni' ).hasClass( 'parsley-error' ) ).to.be( true );
+        expect( getErrorMessage( '#es_dni', 'es_dni') ).to.be( 'This value should be a valid DNI (Example: 00000000T).' );
+
+        triggerSubmitValidation( '#es_dni', '43215678X' );
+        expect( $( '#es_dni' ).hasClass( 'parsley-error' ) ).to.be( true );
+        expect( getErrorMessage( '#es_dni', 'es_dni') ).to.be( 'This value should be a valid DNI (Example: 00000000T).' );
+      } )
+      it ( 'es_postalcode', function () {
+        triggerSubmitValidation( '#es_postalcode', '28080' );
+        expect( $( '#es_postalcode' ).hasClass( 'parsley-success' ) ).to.be( true );
+
+        triggerSubmitValidation( '#es_postalcode', '35500' );
+        expect( $( '#es_postalcode' ).hasClass( 'parsley-success' ) ).to.be( true );
+
+        triggerSubmitValidation( '#es_postalcode', '12012' );
+        expect( $( '#es_postalcode' ).hasClass( 'parsley-success' ) ).to.be( true );
+
+        triggerSubmitValidation( '#es_postalcode', '25120' );
+        expect( $( '#es_postalcode' ).hasClass( 'parsley-success' ) ).to.be( true );
+
+        triggerSubmitValidation( '#es_postalcode', '59000' );
+        expect( $( '#es_postalcode' ).hasClass( 'parsley-error' ) ).to.be( true );
+        expect( getErrorMessage( '#es_postalcode', 'es_postalcode') ).to.be( 'This value should be a valid spanish postal code (Example: 28080).' );
+
+        triggerSubmitValidation( '#es_postalcode', '10' );
+        expect( $( '#es_postalcode' ).hasClass( 'parsley-error' ) ).to.be( true );
+        expect( getErrorMessage( '#es_postalcode', 'es_postalcode') ).to.be( 'This value should be a valid spanish postal code (Example: 28080).' );
+
+        triggerSubmitValidation( '#es_postalcode', 'X123' );
+        expect( $( '#es_postalcode' ).hasClass( 'parsley-error' ) ).to.be( true );
+        expect( getErrorMessage( '#es_postalcode', 'es_postalcode') ).to.be( 'This value should be a valid spanish postal code (Example: 28080).' );
+      } )
+      it ( 'es_ssn', function () {
+        triggerSubmitValidation( '#es_ssn', '281234567840' );
+        expect( $( '#es_ssn' ).hasClass( 'parsley-success' ) ).to.be( true );
+
+        triggerSubmitValidation( '#es_ssn', '351234567825' );
+        expect( $( '#es_ssn' ).hasClass( 'parsley-success' ) ).to.be( true );
+
+        triggerSubmitValidation( '#es_ssn', '35/12345678/25' );
+        expect( $( '#es_ssn' ).hasClass( 'parsley-success' ) ).to.be( true );
+
+        triggerSubmitValidation( '#es_ssn', '720111361735');
+        expect( $( '#es_ssn' ).hasClass( 'parsley-error' ) ).to.be( true );
+        expect( getErrorMessage( '#es_ssn', 'es_ssn') ).to.be( 'This value should be a valid spanish social security number.' );
+
+        triggerSubmitValidation( '#es_ssn', '35X1234567825');
+        expect( $( '#es_ssn' ).hasClass( 'parsley-error' ) ).to.be( true );
+        expect( getErrorMessage( '#es_ssn', 'es_ssn') ).to.be( 'This value should be a valid spanish social security number.' );
+
+        triggerSubmitValidation( '#es_ssn', '031322136383');
+        expect( $( '#es_ssn' ).hasClass( 'parsley-error' ) ).to.be( true );
+        expect( getErrorMessage( '#es_ssn', 'es_ssn') ).to.be( 'This value should be a valid spanish social security number.' );
+
+        triggerSubmitValidation( '#es_ssn', '72011a361732');
+        expect( $( '#es_ssn' ).hasClass( 'parsley-error' ) ).to.be( true );
+        expect( getErrorMessage( '#es_ssn', 'es_ssn') ).to.be( 'This value should be a valid spanish social security number.' );
 
-         triggerSubmitValidation( '#es_ssn', '35X1234567825');
-    	 expect( $( '#es_ssn' ).hasClass( 'parsley-error' ) ).to.be( true );
-    	 expect( getErrorMessage( '#es_ssn', 'es_ssn') ).to.be( 'This value should be a valid spanish social security number.' );
+        triggerSubmitValidation( '#es_ssn', '73011a361731');
+        expect( $( '#es_ssn' ).hasClass( 'parsley-error' ) ).to.be( true );
+        expect( getErrorMessage( '#es_ssn', 'es_ssn') ).to.be( 'This value should be a valid spanish social security number.' );
 
-         triggerSubmitValidation( '#es_ssn', '031322136383');
-    	 expect( $( '#es_ssn' ).hasClass( 'parsley-error' ) ).to.be( true );
-    	 expect( getErrorMessage( '#es_ssn', 'es_ssn') ).to.be( 'This value should be a valid spanish social security number.' );
+        triggerSubmitValidation( '#es_ssn', '03092a136383');
+        expect( $( '#es_ssn' ).hasClass( 'parsley-error' ) ).to.be( true );
+        expect( getErrorMessage( '#es_ssn', 'es_ssn') ).to.be( 'This value should be a valid spanish social security number.' );
 
-         triggerSubmitValidation( '#es_ssn', '72011a361732');
-    	 expect( $( '#es_ssn' ).hasClass( 'parsley-error' ) ).to.be( true );
-    	 expect( getErrorMessage( '#es_ssn', 'es_ssn') ).to.be( 'This value should be a valid spanish social security number.' );
+        triggerSubmitValidation( '#es_ssn', '03132a136385');
+        expect( $( '#es_ssn' ).hasClass( 'parsley-error' ) ).to.be( true );
+        expect( getErrorMessage( '#es_ssn', 'es_ssn') ).to.be( 'This value should be a valid spanish social security number.' );
 
-         triggerSubmitValidation( '#es_ssn', '73011a361731');
-    	 expect( $( '#es_ssn' ).hasClass( 'parsley-error' ) ).to.be( true );
-    	 expect( getErrorMessage( '#es_ssn', 'es_ssn') ).to.be( 'This value should be a valid spanish social security number.' );
+        triggerSubmitValidation( '#es_ssn', '201113617312');
+        expect( $( '#es_ssn' ).hasClass( 'parsley-error' ) ).to.be( true );
+        expect( getErrorMessage( '#es_ssn', 'es_ssn') ).to.be( 'This value should be a valid spanish social security number.' );
 
-         triggerSubmitValidation( '#es_ssn', '03092a136383');
-    	 expect( $( '#es_ssn' ).hasClass( 'parsley-error' ) ).to.be( true );
-    	 expect( getErrorMessage( '#es_ssn', 'es_ssn') ).to.be( 'This value should be a valid spanish social security number.' );
+        triggerSubmitValidation( '#es_ssn', '301113617334');
+        expect( $( '#es_ssn' ).hasClass( 'parsley-error' ) ).to.be( true );
+        expect( getErrorMessage( '#es_ssn', 'es_ssn') ).to.be( 'This value should be a valid spanish social security number.' );
 
-         triggerSubmitValidation( '#es_ssn', '03132a136385');
-    	 expect( $( '#es_ssn' ).hasClass( 'parsley-error' ) ).to.be( true );
-    	 expect( getErrorMessage( '#es_ssn', 'es_ssn') ).to.be( 'This value should be a valid spanish social security number.' );
+        triggerSubmitValidation( '#es_ssn', '309221363823');
+        expect( $( '#es_ssn' ).hasClass( 'parsley-error' ) ).to.be( true );
+        expect( getErrorMessage( '#es_ssn', 'es_ssn') ).to.be( 'This value should be a valid spanish social security number.' );
 
-         triggerSubmitValidation( '#es_ssn', '201113617312');
-    	 expect( $( '#es_ssn' ).hasClass( 'parsley-error' ) ).to.be( true );
-    	 expect( getErrorMessage( '#es_ssn', 'es_ssn') ).to.be( 'This value should be a valid spanish social security number.' );
+        triggerSubmitValidation( '#es_ssn', '313221363822');
+        expect( $( '#es_ssn' ).hasClass( 'parsley-error' ) ).to.be( true );
+        expect( getErrorMessage( '#es_ssn', 'es_ssn') ).to.be( 'This value should be a valid spanish social security number.' );
+      } )
+      it ( 'es_ccc', function () {
+        triggerSubmitValidation( '#es_ccc', '2077 0024 00 3102575766' );
+        expect( $( '#es_ccc' ).hasClass( 'parsley-success' ) ).to.be( true );
 
-         triggerSubmitValidation( '#es_ssn', '301113617334');
-    	 expect( $( '#es_ssn' ).hasClass( 'parsley-error' ) ).to.be( true );
-    	 expect( getErrorMessage( '#es_ssn', 'es_ssn') ).to.be( 'This value should be a valid spanish social security number.' );
+        triggerSubmitValidation( '#es_ccc', '0000 0000 00 0000000000' );
+        expect( $( '#es_ccc' ).hasClass( 'parsley-success' ) ).to.be( true );
 
-         triggerSubmitValidation( '#es_ssn', '309221363823');
-    	 expect( $( '#es_ssn' ).hasClass( 'parsley-error' ) ).to.be( true );
-    	 expect( getErrorMessage( '#es_ssn', 'es_ssn') ).to.be( 'This value should be a valid spanish social security number.' );
+        triggerSubmitValidation( '#es_ccc', '0001 0001 65 0000000001' );
+        expect( $( '#es_ccc' ).hasClass( 'parsley-success' ) ).to.be( true );
 
-         triggerSubmitValidation( '#es_ssn', '313221363822');
-    	 expect( $( '#es_ssn' ).hasClass( 'parsley-error' ) ).to.be( true );
-    	 expect( getErrorMessage( '#es_ssn', 'es_ssn') ).to.be( 'This value should be a valid spanish social security number.' );
-       } )
-       it ( 'es_ccc', function () {
-    	 triggerSubmitValidation( '#es_ccc', '2077 0024 00 3102575766' );
-    	 expect( $( '#es_ccc' ).hasClass( 'parsley-success' ) ).to.be( true );
+        triggerSubmitValidation( '#es_ccc', '0');
+        expect( $( '#es_ccc' ).hasClass( 'parsley-error' ) ).to.be( true );
+        expect( getErrorMessage( '#es_ccc', 'es_ccc') ).to.be( 'This value should be a valid spanish bank client account code.' );
 
-    	 triggerSubmitValidation( '#es_ccc', '0000 0000 00 0000000000' );
-    	 expect( $( '#es_ccc' ).hasClass( 'parsley-success' ) ).to.be( true );
+        triggerSubmitValidation( '#es_ccc', '2034 4505 73 1000034682');
+        expect( $( '#es_ccc' ).hasClass( 'parsley-error' ) ).to.be( true );
+        expect( getErrorMessage( '#es_ccc', 'es_ccc') ).to.be( 'This value should be a valid spanish bank client account code.' );
 
-    	 triggerSubmitValidation( '#es_ccc', '0001 0001 65 0000000001' );
-    	 expect( $( '#es_ccc' ).hasClass( 'parsley-success' ) ).to.be( true );
+        triggerSubmitValidation( '#es_ccc', '1111 1111 11 1111111111');
+        expect( $( '#es_ccc' ).hasClass( 'parsley-error' ) ).to.be( true );
+        expect( getErrorMessage( '#es_ccc', 'es_ccc') ).to.be( 'This value should be a valid spanish bank client account code.' );
+      } )
+      it ( 'es_cif', function () {
+        triggerSubmitValidation( '#es_cif', 'A58818501');
+        expect( $( '#es_cif' ).hasClass( 'parsley-success' ) ).to.be( true );
 
-         triggerSubmitValidation( '#es_ccc', '0');
-    	 expect( $( '#es_ccc' ).hasClass( 'parsley-error' ) ).to.be( true );
-    	 expect( getErrorMessage( '#es_ccc', 'es_ccc') ).to.be( 'This value should be a valid spanish bank client account code.' );
+        triggerSubmitValidation( '#es_cif', 'B00000000');
+        expect( $( '#es_cif' ).hasClass( 'parsley-success' ) ).to.be( true );
 
-         triggerSubmitValidation( '#es_ccc', '2034 4505 73 1000034682');
-    	 expect( $( '#es_ccc' ).hasClass( 'parsley-error' ) ).to.be( true );
-    	 expect( getErrorMessage( '#es_ccc', 'es_ccc') ).to.be( 'This value should be a valid spanish bank client account code.' );
+        triggerSubmitValidation( '#es_cif', 'C0000000J');
+        expect( $( '#es_cif' ).hasClass( 'parsley-success' ) ).to.be( true );
 
-         triggerSubmitValidation( '#es_ccc', '1111 1111 11 1111111111');
-    	 expect( $( '#es_ccc' ).hasClass( 'parsley-error' ) ).to.be( true );
-    	 expect( getErrorMessage( '#es_ccc', 'es_ccc') ).to.be( 'This value should be a valid spanish bank client account code.' );
-       } )
-       it ( 'es_cif', function () {
-         triggerSubmitValidation( '#es_cif', 'A58818501');
-    	 expect( $( '#es_cif' ).hasClass( 'parsley-success' ) ).to.be( true );
+        triggerSubmitValidation( '#es_cif', 'D00000000');
+        expect( $( '#es_cif' ).hasClass( 'parsley-success' ) ).to.be( true );
 
-         triggerSubmitValidation( '#es_cif', 'B00000000');
-    	 expect( $( '#es_cif' ).hasClass( 'parsley-success' ) ).to.be( true );
+        triggerSubmitValidation( '#es_cif', 'E00000000');
+        expect( $( '#es_cif' ).hasClass( 'parsley-success' ) ).to.be( true );
 
-         triggerSubmitValidation( '#es_cif', 'C0000000J');
-    	 expect( $( '#es_cif' ).hasClass( 'parsley-success' ) ).to.be( true );
+        triggerSubmitValidation( '#es_cif', 'F00000000');
+        expect( $( '#es_cif' ).hasClass( 'parsley-success' ) ).to.be( true );
 
-         triggerSubmitValidation( '#es_cif', 'D00000000');
-    	 expect( $( '#es_cif' ).hasClass( 'parsley-success' ) ).to.be( true );
+        triggerSubmitValidation( '#es_cif', 'G00000000');
+        expect( $( '#es_cif' ).hasClass( 'parsley-success' ) ).to.be( true );
 
-         triggerSubmitValidation( '#es_cif', 'E00000000');
-    	 expect( $( '#es_cif' ).hasClass( 'parsley-success' ) ).to.be( true );
+        triggerSubmitValidation( '#es_cif', 'H00000000');
+        expect( $( '#es_cif' ).hasClass( 'parsley-success' ) ).to.be( true );
 
-         triggerSubmitValidation( '#es_cif', 'F00000000');
-    	 expect( $( '#es_cif' ).hasClass( 'parsley-success' ) ).to.be( true );
+        triggerSubmitValidation( '#es_cif', 'J00000000');
+        expect( $( '#es_cif' ).hasClass( 'parsley-success' ) ).to.be( true );
 
-         triggerSubmitValidation( '#es_cif', 'G00000000');
-    	 expect( $( '#es_cif' ).hasClass( 'parsley-success' ) ).to.be( true );
+        triggerSubmitValidation( '#es_cif', 'K0000000J');
+        expect( $( '#es_cif' ).hasClass( 'parsley-success' ) ).to.be( true );
 
-         triggerSubmitValidation( '#es_cif', 'H00000000');
-    	 expect( $( '#es_cif' ).hasClass( 'parsley-success' ) ).to.be( true );
+        triggerSubmitValidation( '#es_cif', 'L0000000J');
+        expect( $( '#es_cif' ).hasClass( 'parsley-success' ) ).to.be( true );
 
-         triggerSubmitValidation( '#es_cif', 'J00000000');
-    	 expect( $( '#es_cif' ).hasClass( 'parsley-success' ) ).to.be( true );
+        triggerSubmitValidation( '#es_cif', 'M0000000J');
+        expect( $( '#es_cif' ).hasClass( 'parsley-success' ) ).to.be( true );
 
-         triggerSubmitValidation( '#es_cif', 'K0000000J');
-    	 expect( $( '#es_cif' ).hasClass( 'parsley-success' ) ).to.be( true );
+        triggerSubmitValidation( '#es_cif', 'N0000000J');
+        expect( $( '#es_cif' ).hasClass( 'parsley-success' ) ).to.be( true );
 
-         triggerSubmitValidation( '#es_cif', 'L0000000J');
-    	 expect( $( '#es_cif' ).hasClass( 'parsley-success' ) ).to.be( true );
+        triggerSubmitValidation( '#es_cif', 'P0000000J');
+        expect( $( '#es_cif' ).hasClass( 'parsley-success' ) ).to.be( true );
 
-         triggerSubmitValidation( '#es_cif', 'M0000000J');
-    	 expect( $( '#es_cif' ).hasClass( 'parsley-success' ) ).to.be( true );
+        triggerSubmitValidation( '#es_cif', 'Q0000000J');
+        expect( $( '#es_cif' ).hasClass( 'parsley-success' ) ).to.be( true );
 
-         triggerSubmitValidation( '#es_cif', 'N0000000J');
-    	 expect( $( '#es_cif' ).hasClass( 'parsley-success' ) ).to.be( true );
+        triggerSubmitValidation( '#es_cif', 'R0000000J');
+        expect( $( '#es_cif' ).hasClass( 'parsley-success' ) ).to.be( true );
 
-         triggerSubmitValidation( '#es_cif', 'P0000000J');
-    	 expect( $( '#es_cif' ).hasClass( 'parsley-success' ) ).to.be( true );
+        triggerSubmitValidation( '#es_cif', 'S0000000J');
+        expect( $( '#es_cif' ).hasClass( 'parsley-success' ) ).to.be( true );
 
-         triggerSubmitValidation( '#es_cif', 'Q0000000J');
-    	 expect( $( '#es_cif' ).hasClass( 'parsley-success' ) ).to.be( true );
+        triggerSubmitValidation( '#es_cif', 'U00000000');
+        expect( $( '#es_cif' ).hasClass( 'parsley-success' ) ).to.be( true );
 
-         triggerSubmitValidation( '#es_cif', 'R0000000J');
-    	 expect( $( '#es_cif' ).hasClass( 'parsley-success' ) ).to.be( true );
+        triggerSubmitValidation( '#es_cif', 'V00000000');
+        expect( $( '#es_cif' ).hasClass( 'parsley-success' ) ).to.be( true );
 
-         triggerSubmitValidation( '#es_cif', 'S0000000J');
-    	 expect( $( '#es_cif' ).hasClass( 'parsley-success' ) ).to.be( true );
+        triggerSubmitValidation( '#es_cif', 'W0000000J');
+        expect( $( '#es_cif' ).hasClass( 'parsley-success' ) ).to.be( true );
 
-         triggerSubmitValidation( '#es_cif', 'U00000000');
-    	 expect( $( '#es_cif' ).hasClass( 'parsley-success' ) ).to.be( true );
+        triggerSubmitValidation( '#es_cif', 'B-00000000');
+        expect( $( '#es_cif' ).hasClass( 'parsley-success' ) ).to.be( true );
 
-         triggerSubmitValidation( '#es_cif', 'V00000000');
-    	 expect( $( '#es_cif' ).hasClass( 'parsley-success' ) ).to.be( true );
+        triggerSubmitValidation( '#es_cif', 'K-0000000-J');
+        expect( $( '#es_cif' ).hasClass( 'parsley-success' ) ).to.be( true );
 
-         triggerSubmitValidation( '#es_cif', 'W0000000J');
-    	 expect( $( '#es_cif' ).hasClass( 'parsley-success' ) ).to.be( true );
 
-         triggerSubmitValidation( '#es_cif', 'B-00000000');
-    	 expect( $( '#es_cif' ).hasClass( 'parsley-success' ) ).to.be( true );
+        triggerSubmitValidation( '#es_cif', 'X00000000');
+        expect( $( '#es_cif' ).hasClass( 'parsley-error' ) ).to.be( true );
+        expect( getErrorMessage( '#es_cif', 'es_cif') ).to.be( 'This value should be a valid CIF (Example: B00000000).' );
 
-         triggerSubmitValidation( '#es_cif', 'K-0000000-J');
-    	 expect( $( '#es_cif' ).hasClass( 'parsley-success' ) ).to.be( true );
+        triggerSubmitValidation( '#es_cif', 'X0000000J');
+        expect( $( '#es_cif' ).hasClass( 'parsley-error' ) ).to.be( true );
+        expect( getErrorMessage( '#es_cif', 'es_cif') ).to.be( 'This value should be a valid CIF (Example: B00000000).' );
 
+        triggerSubmitValidation( '#es_cif', 'Y00000000');
+        expect( $( '#es_cif' ).hasClass( 'parsley-error' ) ).to.be( true );
+        expect( getErrorMessage( '#es_cif', 'es_cif') ).to.be( 'This value should be a valid CIF (Example: B00000000).' );
 
-         triggerSubmitValidation( '#es_cif', 'X00000000');
-    	 expect( $( '#es_cif' ).hasClass( 'parsley-error' ) ).to.be( true );
-    	 expect( getErrorMessage( '#es_cif', 'es_cif') ).to.be( 'This value should be a valid CIF (Example: B00000000).' );
+        triggerSubmitValidation( '#es_cif', 'Y0000000J');
+        expect( $( '#es_cif' ).hasClass( 'parsley-error' ) ).to.be( true );
+        expect( getErrorMessage( '#es_cif', 'es_cif') ).to.be( 'This value should be a valid CIF (Example: B00000000).' );
 
-         triggerSubmitValidation( '#es_cif', 'X0000000J');
-    	 expect( $( '#es_cif' ).hasClass( 'parsley-error' ) ).to.be( true );
-    	 expect( getErrorMessage( '#es_cif', 'es_cif') ).to.be( 'This value should be a valid CIF (Example: B00000000).' );
+        triggerSubmitValidation( '#es_cif', 'Z00000000');
+        expect( $( '#es_cif' ).hasClass( 'parsley-error' ) ).to.be( true );
+        expect( getErrorMessage( '#es_cif', 'es_cif') ).to.be( 'This value should be a valid CIF (Example: B00000000).' );
 
-         triggerSubmitValidation( '#es_cif', 'Y00000000');
-    	 expect( $( '#es_cif' ).hasClass( 'parsley-error' ) ).to.be( true );
-    	 expect( getErrorMessage( '#es_cif', 'es_cif') ).to.be( 'This value should be a valid CIF (Example: B00000000).' );
+        triggerSubmitValidation( '#es_cif', 'Z0000000J');
+        expect( $( '#es_cif' ).hasClass( 'parsley-error' ) ).to.be( true );
+        expect( getErrorMessage( '#es_cif', 'es_cif') ).to.be( 'This value should be a valid CIF (Example: B00000000).' );
 
-         triggerSubmitValidation( '#es_cif', 'Y0000000J');
-    	 expect( $( '#es_cif' ).hasClass( 'parsley-error' ) ).to.be( true );
-    	 expect( getErrorMessage( '#es_cif', 'es_cif') ).to.be( 'This value should be a valid CIF (Example: B00000000).' );
+        triggerSubmitValidation( '#es_cif', 'B0000000J');
+        expect( $( '#es_cif' ).hasClass( 'parsley-error' ) ).to.be( true );
+        expect( getErrorMessage( '#es_cif', 'es_cif') ).to.be( 'This value should be a valid CIF (Example: B00000000).' );
 
-         triggerSubmitValidation( '#es_cif', 'Z00000000');
-    	 expect( $( '#es_cif' ).hasClass( 'parsley-error' ) ).to.be( true );
-    	 expect( getErrorMessage( '#es_cif', 'es_cif') ).to.be( 'This value should be a valid CIF (Example: B00000000).' );
+        triggerSubmitValidation( '#es_cif', 'BC0000000');
+        expect( $( '#es_cif' ).hasClass( 'parsley-error' ) ).to.be( true );
+        expect( getErrorMessage( '#es_cif', 'es_cif') ).to.be( 'This value should be a valid CIF (Example: B00000000).' );
 
-         triggerSubmitValidation( '#es_cif', 'Z0000000J');
-    	 expect( $( '#es_cif' ).hasClass( 'parsley-error' ) ).to.be( true );
-    	 expect( getErrorMessage( '#es_cif', 'es_cif') ).to.be( 'This value should be a valid CIF (Example: B00000000).' );
+        triggerSubmitValidation( '#es_cif', '123456678');
+        expect( $( '#es_cif' ).hasClass( 'parsley-error' ) ).to.be( true );
+        expect( getErrorMessage( '#es_cif', 'es_cif') ).to.be( 'This value should be a valid CIF (Example: B00000000).' );
 
-         triggerSubmitValidation( '#es_cif', 'B0000000J');
-    	 expect( $( '#es_cif' ).hasClass( 'parsley-error' ) ).to.be( true );
-    	 expect( getErrorMessage( '#es_cif', 'es_cif') ).to.be( 'This value should be a valid CIF (Example: B00000000).' );
+        triggerSubmitValidation( '#es_cif', 'I00000000');
+        expect( $( '#es_cif' ).hasClass( 'parsley-error' ) ).to.be( true );
+        expect( getErrorMessage( '#es_cif', 'es_cif') ).to.be( 'This value should be a valid CIF (Example: B00000000).' );
 
-         triggerSubmitValidation( '#es_cif', 'BC0000000');
-    	 expect( $( '#es_cif' ).hasClass( 'parsley-error' ) ).to.be( true );
-    	 expect( getErrorMessage( '#es_cif', 'es_cif') ).to.be( 'This value should be a valid CIF (Example: B00000000).' );
+        triggerSubmitValidation( '#es_cif', 'I0000000J');
+        expect( $( '#es_cif' ).hasClass( 'parsley-error' ) ).to.be( true );
+        expect( getErrorMessage( '#es_cif', 'es_cif') ).to.be( 'This value should be a valid CIF (Example: B00000000).' );
 
-         triggerSubmitValidation( '#es_cif', '123456678');
-    	 expect( $( '#es_cif' ).hasClass( 'parsley-error' ) ).to.be( true );
-    	 expect( getErrorMessage( '#es_cif', 'es_cif') ).to.be( 'This value should be a valid CIF (Example: B00000000).' );
+        triggerSubmitValidation( '#es_cif', 'O00000000');
+        expect( $( '#es_cif' ).hasClass( 'parsley-error' ) ).to.be( true );
+        expect( getErrorMessage( '#es_cif', 'es_cif') ).to.be( 'This value should be a valid CIF (Example: B00000000).' );
 
-         triggerSubmitValidation( '#es_cif', 'I00000000');
-    	 expect( $( '#es_cif' ).hasClass( 'parsley-error' ) ).to.be( true );
-    	 expect( getErrorMessage( '#es_cif', 'es_cif') ).to.be( 'This value should be a valid CIF (Example: B00000000).' );
+        triggerSubmitValidation( '#es_cif', 'O0000000J');
+        expect( $( '#es_cif' ).hasClass( 'parsley-error' ) ).to.be( true );
+        expect( getErrorMessage( '#es_cif', 'es_cif') ).to.be( 'This value should be a valid CIF (Example: B00000000).' );
 
-         triggerSubmitValidation( '#es_cif', 'I0000000J');
-    	 expect( $( '#es_cif' ).hasClass( 'parsley-error' ) ).to.be( true );
-    	 expect( getErrorMessage( '#es_cif', 'es_cif') ).to.be( 'This value should be a valid CIF (Example: B00000000).' );
+        triggerSubmitValidation( '#es_cif', 'T00000000');
+        expect( $( '#es_cif' ).hasClass( 'parsley-error' ) ).to.be( true );
+        expect( getErrorMessage( '#es_cif', 'es_cif') ).to.be( 'This value should be a valid CIF (Example: B00000000).' );
 
-         triggerSubmitValidation( '#es_cif', 'O00000000');
-    	 expect( $( '#es_cif' ).hasClass( 'parsley-error' ) ).to.be( true );
-    	 expect( getErrorMessage( '#es_cif', 'es_cif') ).to.be( 'This value should be a valid CIF (Example: B00000000).' );
-
-         triggerSubmitValidation( '#es_cif', 'O0000000J');
-    	 expect( $( '#es_cif' ).hasClass( 'parsley-error' ) ).to.be( true );
-    	 expect( getErrorMessage( '#es_cif', 'es_cif') ).to.be( 'This value should be a valid CIF (Example: B00000000).' );
-
-         triggerSubmitValidation( '#es_cif', 'T00000000');
-    	 expect( $( '#es_cif' ).hasClass( 'parsley-error' ) ).to.be( true );
-    	 expect( getErrorMessage( '#es_cif', 'es_cif') ).to.be( 'This value should be a valid CIF (Example: B00000000).' );
-
-         triggerSubmitValidation( '#es_cif', 'T0000000J');
-    	 expect( $( '#es_cif' ).hasClass( 'parsley-error' ) ).to.be( true );
-    	 expect( getErrorMessage( '#es_cif', 'es_cif') ).to.be( 'This value should be a valid CIF (Example: B00000000).' );
-       } )
-     } )
+        triggerSubmitValidation( '#es_cif', 'T0000000J');
+        expect( $( '#es_cif' ).hasClass( 'parsley-error' ) ).to.be( true );
+        expect( getErrorMessage( '#es_cif', 'es_cif') ).to.be( 'This value should be a valid CIF (Example: B00000000).' );
+      } )
+    } )
   } )
 }
